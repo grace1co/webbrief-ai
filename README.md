@@ -1,4 +1,3 @@
-````markdown
 # WebBrief AI
 
 **Turn any website into a source-grounded research brief.**
@@ -211,4 +210,4 @@ http://localhost:5173
 
 4. Paste a public website URL and click **Analyze Website**.
 5. Explore the Overview, Ask, Sources, Brief, Score, and Compare pages.
-````
+
