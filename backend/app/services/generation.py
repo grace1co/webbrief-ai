@@ -202,12 +202,72 @@ def generate_scores(analysis_id: str) -> dict:
     }
 
 
+def _normalize_comparison(data: dict, site_labels: list[str]) -> dict:
+    sites = data.get("sites", [])
+    normalized_sites: list[dict] = []
+    for idx, label in enumerate(site_labels):
+        site_key = f"site_{idx + 1}"
+        raw = next((s for s in sites if s.get("site_key") == site_key), {})
+        normalized_sites.append({
+            "site_key": site_key,
+            "label": str(raw.get("label") or label),
+            "summary": str(raw.get("summary", "")),
+            "website_type": str(raw.get("website_type", "")),
+            "has_pricing": bool(raw.get("has_pricing", False)),
+        })
+
+    dimensions: list[dict] = []
+    for dim in data.get("dimensions", []):
+        key = str(dim.get("key", "")).strip()
+        if not key:
+            continue
+        values_by_key = {
+            str(v.get("site_key", "")): str(v.get("finding", ""))
+            for v in dim.get("values", [])
+        }
+        values = [
+            {"site_key": site["site_key"], "finding": values_by_key.get(site["site_key"], "")}
+            for site in normalized_sites
+        ]
+        dimensions.append({
+            "key": key,
+            "label": str(dim.get("label", key.replace("_", " ").title())),
+            "values": values,
+            "site_a": values[0]["finding"] if len(values) > 0 else "",
+            "site_b": values[1]["finding"] if len(values) > 1 else "",
+        })
+
+    result = {
+        "sites": normalized_sites,
+        "dimensions": dimensions,
+        "similarities": data.get("similarities", []),
+        "differences": data.get("differences", []),
+        "final_summary": str(data.get("final_summary", "")),
+    }
+
+    if normalized_sites:
+        result["website_a_summary"] = normalized_sites[0]["summary"]
+        result["website_a_type"] = normalized_sites[0]["website_type"]
+        result["has_pricing_a"] = normalized_sites[0]["has_pricing"]
+    if len(normalized_sites) > 1:
+        result["website_b_summary"] = normalized_sites[1]["summary"]
+        result["website_b_type"] = normalized_sites[1]["website_type"]
+        result["has_pricing_b"] = normalized_sites[1]["has_pricing"]
+
+    return result
+
+
+def generate_multi_comparison(analysis_ids: list[str], site_labels: list[str] | None = None) -> dict:
+    labels = site_labels or [f"Site {idx + 1}" for idx in range(len(analysis_ids))]
+    context_blocks = []
+    for idx, analysis_id in enumerate(analysis_ids):
+        site_key = f"site_{idx + 1}"
+        context = rag_service.gather_context(analysis_id, "overview products pricing trust", top_k=12)
+        context_blocks.append(f"{site_key.upper()} ({labels[idx]}) CONTEXT:\n{context}")
+
+    data = chat_json(COMPARE_SYSTEM, "\n\n".join(context_blocks) + "\n\nReturn the comparison JSON.")
+    return _normalize_comparison(data, labels)
+
+
 def generate_comparison(analysis_id_a: str, analysis_id_b: str) -> dict:
-    ctx_a = rag_service.gather_context(analysis_id_a, "overview products pricing trust", top_k=12)
-    ctx_b = rag_service.gather_context(analysis_id_b, "overview products pricing trust", top_k=12)
-    user = (
-        f"WEBSITE A CONTEXT:\n{ctx_a}\n\n"
-        f"WEBSITE B CONTEXT:\n{ctx_b}\n\n"
-        "Return the comparison JSON."
-    )
-    return chat_json(COMPARE_SYSTEM, user)
+    return generate_multi_comparison(analysis_ids=[analysis_id_a, analysis_id_b], site_labels=["Current Website", "Competitor Website"])

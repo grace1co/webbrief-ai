@@ -189,6 +189,7 @@ export const api = {
     analysis_id_b?: string;
     url_a?: string;
     url_b?: string;
+    sites?: { analysis_id?: string; url?: string; label?: string }[];
   }) =>
     request<CompareResponse>("/compare-websites", {
       method: "POST",

@@ -152,11 +152,31 @@ class ScoreResponse(BaseModel):
     scores: dict[str, ScoreItem] = {}
 
 
+class CompareSiteInput(BaseModel):
+    analysis_id: str | None = None
+    url: str | None = None
+    label: str | None = None
+
+
 class CompareRequest(BaseModel):
     analysis_id_a: str | None = None
     analysis_id_b: str | None = None
     url_a: str | None = None
     url_b: str | None = None
+    sites: list[CompareSiteInput] | None = None
+
+
+class ComparisonSite(BaseModel):
+    site_key: str
+    label: str = ""
+    summary: str = ""
+    website_type: str = ""
+    has_pricing: bool = False
+
+
+class ComparisonValue(BaseModel):
+    site_key: str
+    finding: str = ""
 
 
 class ComparisonDimension(BaseModel):
@@ -164,10 +184,12 @@ class ComparisonDimension(BaseModel):
     label: str
     site_a: str = ""
     site_b: str = ""
+    values: list[ComparisonValue] = []
 
 
 class CompareResponse(BaseModel):
     comparison_id: str
+    sites: list[ComparisonSite] = []
     website_a_summary: str = ""
     website_b_summary: str = ""
     website_a_type: str = ""

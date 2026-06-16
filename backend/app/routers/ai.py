@@ -21,6 +21,8 @@ from app.schemas import (
     CompareRequest,
     CompareResponse,
     ComparisonDimension,
+    ComparisonSite,
+    ComparisonValue,
     DynamicScoreDimension,
     GenerateReportRequest,
     GenerateReportResponse,
@@ -240,10 +242,9 @@ def _build_score_response(analysis_id: str, result: dict) -> ScoreResponse:
 
 @router.post("/compare-websites", response_model=CompareResponse)
 def compare_websites(body: CompareRequest, db: Session = Depends(get_db)) -> CompareResponse:
-    def resolve(analysis_id: str | None, url: str | None) -> str:
+    def resolve(analysis_id: str | None, url: str | None) -> WebsiteAnalysis:
         if analysis_id:
-            _require_analysis(db, analysis_id)
-            return analysis_id
+            return _require_analysis(db, analysis_id)
         if url:
             try:
                 normalized = validate_public_url(url)
@@ -257,18 +258,30 @@ def compare_websites(body: CompareRequest, db: Session = Depends(get_db)) -> Com
                 analysis_service.run_analysis(db, a, max_pages=8)
             except Exception as exc:  # noqa: BLE001
                 raise HTTPException(status_code=502, detail=f"Analysis failed: {exc}") from exc
-            return a.id
+            return a
         raise HTTPException(status_code=400, detail="Provide an analysis_id or url for both sides.")
 
-    id_a = resolve(body.analysis_id_a, body.url_a)
-    id_b = resolve(body.analysis_id_b, body.url_b)
+    if body.sites:
+        if not 2 <= len(body.sites) <= 5:
+            raise HTTPException(status_code=400, detail="Compare between 2 and 5 websites.")
+        analyses = [resolve(site.analysis_id, site.url) for site in body.sites]
+        labels = [
+            site.label or analysis.website_title or analysis.normalized_url
+            for site, analysis in zip(body.sites, analyses, strict=False)
+        ]
+    else:
+        analyses = [resolve(body.analysis_id_a, body.url_a), resolve(body.analysis_id_b, body.url_b)]
+        labels = [
+            analyses[0].website_title or "Current Website",
+            analyses[1].website_title or "Competitor Website",
+        ]
 
     try:
-        comp = generation.generate_comparison(id_a, id_b)
+        comp = generation.generate_multi_comparison([a.id for a in analyses], labels)
     except Exception as exc:  # noqa: BLE001
         raise HTTPException(status_code=502, detail=f"Comparison failed: {exc}") from exc
 
-    row = WebsiteComparison(analysis_id_a=id_a, analysis_id_b=id_b, comparison_json=comp)
+    row = WebsiteComparison(analysis_id_a=analyses[0].id, analysis_id_b=analyses[1].id, comparison_json=comp)
     db.add(row)
     db.commit()
     db.refresh(row)
@@ -281,6 +294,10 @@ def compare_websites(body: CompareRequest, db: Session = Depends(get_db)) -> Com
             label=str(d.get("label", "")),
             site_a=str(d.get("site_a", "")),
             site_b=str(d.get("site_b", "")),
+            values=[
+                ComparisonValue(site_key=str(v.get("site_key", "")), finding=str(v.get("finding", "")))
+                for v in d.get("values", [])
+            ],
         )
         for d in raw_dims
         if d.get("key")
@@ -288,6 +305,7 @@ def compare_websites(body: CompareRequest, db: Session = Depends(get_db)) -> Com
 
     return CompareResponse(
         comparison_id=row.id,
+        sites=[ComparisonSite(**site) for site in comp.get("sites", [])],
         website_a_summary=comp.get("website_a_summary", ""),
         website_b_summary=comp.get("website_b_summary", ""),
         website_a_type=comp.get("website_a_type", ""),

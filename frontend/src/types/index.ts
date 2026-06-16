@@ -122,10 +122,20 @@ export interface ComparisonDimension {
   label: string;
   site_a: string;
   site_b: string;
+  values: { site_key: string; finding: string }[];
+}
+
+export interface ComparisonSite {
+  site_key: string;
+  label: string;
+  summary: string;
+  website_type: string;
+  has_pricing: boolean;
 }
 
 export interface CompareResponse {
   comparison_id: string;
+  sites: ComparisonSite[];
   website_a_summary: string;
   website_b_summary: string;
   website_a_type: string;
