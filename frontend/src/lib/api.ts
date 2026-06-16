@@ -11,7 +11,7 @@ import type {
   SourcePage,
 } from "../types";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const BASE = `${(import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000").replace(/\/$/, "")}/api`;
 
 export class ApiError extends Error {
   constructor(message: string, public status: number) {
