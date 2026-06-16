@@ -37,7 +37,7 @@ export function Sidebar({ analysisId }: { analysisId?: string }) {
         ))}
       </nav>
 
-      // Show analysis-specific navigation only after an analysis is open.
+      {/* Show analysis-specific navigation only after an analysis is open. */}
       {analysisId && (
         <>
           <div className="px-stack-sm mt-stack-md mb-stack-sm">
