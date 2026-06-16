@@ -26,6 +26,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
   });
 
+  if (!res.ok) {
+    let detail = `Request failed (${res.status})`;
+    try {
+      const body = await res.json();
+      if (body?.detail) detail = body.detail;
+    } catch {
+      /* Preserve the HTTP status when the server returns a non-JSON error. */
+    }
+    throw new ApiError(detail, res.status);
+  }
+
+  return res.json() as Promise<T>;
+}
+
 async function readSseStream(
   path: string,
   body: unknown,
@@ -36,8 +50,8 @@ async function readSseStream(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  
-if (!res.ok) {
+
+  if (!res.ok) {
     let detail = `Request failed (${res.status})`;
     try {
       const b = await res.json();
@@ -48,23 +62,25 @@ if (!res.ok) {
     throw new ApiError(detail, res.status);
   }
 
-if (!res.body) {
-  throw new Error("Response stream is not available.");
-}
+  if (!res.body) {
+    throw new Error("Response stream is not available.");
+  }
 
-const reader = res.body.getReader();
-const decoder = new TextDecoder();
-let buffer = "";
-
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
 
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
+
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
     buffer = lines.pop() ?? "";
+
     for (const line of lines) {
       if (!line.startsWith("data: ")) continue;
+
       try {
         const event = JSON.parse(line.slice(6)) as Record<string, unknown>;
         if (onEvent(event) === false) return;
@@ -74,7 +90,6 @@ let buffer = "";
     }
   }
 }
-
 export const api = {
   analyzeUrl: (url: string, maxPages = 10) =>
     request<AnalyzeResponse>("/analyze-url", {
