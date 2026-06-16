@@ -11,7 +11,7 @@ import type {
   SourcePage,
 } from "../types";
 
-const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api";
+const BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 
 export class ApiError extends Error {
   constructor(message: string, public status: number) {
@@ -25,18 +25,6 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     headers: { "Content-Type": "application/json" },
     ...init,
   });
-  if (!res.ok) {
-    let detail = `Request failed (${res.status})`;
-    try {
-      const body = await res.json();
-      if (body?.detail) detail = body.detail;
-    } catch {
-      /* Preserve the HTTP status when the server returns a non-JSON error. */
-    }
-    throw new ApiError(detail, res.status);
-  }
-  return res.json() as Promise<T>;
-}
 
 async function readSseStream(
   path: string,
@@ -48,7 +36,8 @@ async function readSseStream(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  if (!res.ok) {
+  
+if (!res.ok) {
     let detail = `Request failed (${res.status})`;
     try {
       const b = await res.json();
@@ -56,19 +45,8 @@ async function readSseStream(
     } catch {
       /* Fall back to the status message for non-JSON stream errors. */
     }
-    throw new Error(detail);
+    throw new ApiError(detail, res.status);
   }
-
-  if (!res.ok) {
-  let detail = `Request failed (${res.status})`;
-  try {
-    const b = await res.json();
-    if (b?.detail) detail = b.detail;
-  } catch {
-    /* Fall back to the status message for non-JSON stream errors. */
-  }
-  throw new ApiError(detail, res.status);
-}
 
 if (!res.body) {
   throw new Error("Response stream is not available.");
