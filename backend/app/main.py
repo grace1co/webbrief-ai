@@ -20,7 +20,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url, "http://localhost:5173"],
+    allow_origins=[
+        settings.frontend_url,
+        "http://localhost:5173",
+        "https://webbrief-ai.vercel.app",
+        "https://webbrief-kb4gfkz1f-grace1cos-projects.vercel.app",
+    ],
+    allow_origin_regex=r"https://webbrief.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
