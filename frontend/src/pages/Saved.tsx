@@ -45,7 +45,7 @@ export default function Saved() {
         <div className="flex items-center justify-between gap-stack-md flex-wrap">
           <div>
             <span className="text-label-caps uppercase text-secondary">Saved</span>
-            <h1 className="text-h2 font-bold mt-1">Bookmarked analyses</h1>
+            <h1 className="text-h2 font-bold mt-1">Saved Analyses</h1>
             <p className="text-body-sm text-on-surface-variant">Saved items remain here until you remove them.</p>
           </div>
           <Button onClick={() => navigate("/")}><Icon name="add" /> New Analysis</Button>

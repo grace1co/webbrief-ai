@@ -84,7 +84,7 @@ export default function History() {
   return (
     <Shell>
       <div className="max-w-[1000px] mx-auto px-gutter py-stack-lg flex flex-col gap-stack-md">
-        <div className="flex items-center justify-between gap-stack-md flex-wrap"><div><span className="text-label-caps uppercase text-secondary">History</span><h1 className="text-h2 font-bold mt-1">Recent analyses</h1><p className="text-body-sm text-on-surface-variant">History is automatic. Bookmark analyses you want to keep permanently.</p></div><Button onClick={() => navigate("/")}><Icon name="add" /> New Analysis</Button></div>
+        <div className="flex items-center justify-between gap-stack-md flex-wrap"><div><span className="text-label-caps uppercase text-secondary">History</span><h1 className="text-h2 font-bold mt-1">Recent Analyses</h1><p className="text-body-sm text-on-surface-variant">History is automatic. Bookmark analyses you want to keep permanently.</p></div><Button onClick={() => navigate("/")}><Icon name="add" /> New Analysis</Button></div>
 
         <Card className="flex items-end justify-between gap-stack-md flex-wrap">
           <label className="flex flex-col gap-stack-sm"><span className="text-body-sm font-bold">History retention</span><select value={settings?.retention_days ?? "forever"} onChange={(e) => updateRetention(e.target.value)} disabled={!settings} className="bg-surface-container-high border border-outline-variant rounded-lg px-stack-md py-stack-sm text-body-sm"><option value="7">Keep history for 7 days</option><option value="30">Keep history for 30 days</option><option value="90">Keep history for 90 days</option><option value="forever">Keep history forever</option></select></label>
