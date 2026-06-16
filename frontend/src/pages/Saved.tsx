@@ -44,7 +44,7 @@ export default function Saved() {
       <div className="max-w-[1000px] mx-auto px-gutter py-stack-lg flex flex-col gap-stack-md">
         <div className="flex items-center justify-between gap-stack-md flex-wrap">
           <div>
-            <span className="text-label-caps uppercase text-secondary">Saved</span>
+            <span className="text-label-caps uppercase text-[rgb(0_194_235)] dark:text-secondary">Saved</span>
             <h1 className="text-h2 font-bold mt-1">Saved Analyses</h1>
             <p className="text-body-sm text-on-surface-variant">Saved items remain here until you remove them.</p>
           </div>
