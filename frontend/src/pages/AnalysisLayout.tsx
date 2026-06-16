@@ -88,11 +88,11 @@ export default function AnalysisLayout() {
       headerTitle={`Analysis: ${analysisName}`}
       contentClassName="bg-[#F1F5F9] text-[#0F172A]"
     >
-      <div className="min-h-full max-w-[1200px] mx-auto px-gutter py-stack-lg">
-        {error && <ErrorState message={error} />}
-        {!analysis && !error && <Spinner label="Loading analysis..." className="text-[#64748B]" />}
-        {analysis && <Outlet context={{ analysis } satisfies AnalysisContext} />}
-      </div>
+        <div className="min-h-full max-w-[1200px] mx-auto px-gutter py-stack-lg">
+          {error && <ErrorState message={error} />}
+          {!analysis && !error && <Spinner label="Loading analysis..." className="text-[#64748B]" />}
+          {analysis && <Outlet context={{ analysis } satisfies AnalysisContext} />}
+        </div>
     </Shell>
   );
 }

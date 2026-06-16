@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import type { AnalysisListItem } from "../types";
-import { Button, Card, EmptyState, ErrorState, Icon, Shell, Spinner } from "../components/ui";
+import { Button, Card, EmptyState, ErrorState, Icon, Shell, Spinner, fieldClassName } from "../components/ui";
 
 export default function Saved() {
   const [items, setItems] = useState<AnalysisListItem[] | null>(null);
@@ -57,8 +57,8 @@ export default function Saved() {
 
         {items && items.length > 0 && (
           <div className="relative">
-            <Icon name="search" className="absolute left-stack-sm top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search saved analyses..." className="w-full bg-surface-container-lowest border border-outline-variant rounded-lg pl-10 pr-stack-md py-stack-sm text-body-md focus:outline-none focus:border-primary" />
+            <Icon name="search" className="absolute left-stack-sm top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none dark:text-on-surface-variant" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search saved analyses..." className={`w-full rounded-lg pl-10 pr-stack-md py-stack-sm text-body-md focus:outline-none focus:border-primary ${fieldClassName}`} />
           </div>
         )}
 

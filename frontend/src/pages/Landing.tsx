@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
-import { Button, Card, ErrorState, Icon, Shell } from "../components/ui";
+import { Button, Card, ErrorState, Icon, Shell, fieldClassName } from "../components/ui";
 
 const CRAWL_STEPS = [
   "Validating URL",
@@ -137,13 +137,13 @@ export default function Landing() {
     <Shell>
       <div className="max-w-[900px] mx-auto px-gutter py-stack-md flex flex-col gap-stack-lg">
         <section className="text-center pt-stack-md">
-          <span className="text-label-caps uppercase text-secondary">
+          <span className="text-label-caps uppercase text-[rgb(0_194_235)] dark:text-secondary">
             Source-Backed Website Analysis
           </span>
           <h1 className="text-[32px] sm:text-[34px] leading-tight tracking-[-0.02em] font-bold mt-stack-sm">
             Review website content with source-backed analysis
           </h1>
-          <p className="text-body-lg text-on-surface-variant mt-stack-md max-w-2xl mx-auto">
+          <p className="text-body-lg text-slate-600 dark:text-on-surface-variant mt-stack-md max-w-2xl mx-auto">
             Paste a public website URL. WebBrief AI crawls the site, organizes the content, and
             helps answer questions, summarize key information, score website quality, and compare
             findings based on the website's own sources.
@@ -151,7 +151,7 @@ export default function Landing() {
         </section>
 
         <Card className="flex flex-col gap-stack-md">
-          <label className="text-label-caps uppercase text-on-surface-variant">Website URL</label>
+          <label className="text-label-caps uppercase text-slate-500 dark:text-on-surface-variant">Website URL</label>
           <div className="flex flex-col sm:flex-row gap-stack-sm">
             <input
               value={url}
@@ -162,7 +162,7 @@ export default function Landing() {
                 }
               }}
               placeholder="https://example.com"
-              className="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-stack-md py-stack-sm text-body-md font-[Geist] focus:outline-none focus:border-primary"
+              className={`flex-1 rounded-lg px-stack-md py-stack-sm text-body-md font-[Geist] focus:outline-none focus:border-primary ${fieldClassName}`}
             />
             <Button
               onClick={analyze}
@@ -173,7 +173,7 @@ export default function Landing() {
             </Button>
           </div>
           <div className="flex items-end gap-stack-md flex-wrap">
-            <label className="flex flex-col gap-stack-sm text-body-sm text-on-surface-variant">
+            <label className="flex flex-col gap-stack-sm text-body-sm text-slate-500 dark:text-on-surface-variant">
               <span>Max pages to crawl</span>
               <input
                 type="number"
@@ -181,19 +181,19 @@ export default function Landing() {
                 max={25}
                 value={maxPages}
                 onChange={(e) => setMaxPages(e.target.value === "" ? "" : Number(e.target.value))}
-                className="w-28 bg-surface-container-high border border-outline-variant rounded px-stack-sm py-1 text-on-surface focus:outline-none focus:border-primary"
+                className={`w-28 rounded px-stack-sm py-1 focus:outline-none focus:border-primary ${fieldClassName}`}
               />
             </label>
-            <p className="text-body-sm text-on-surface-variant">
+            <p className="text-body-sm text-slate-500 dark:text-on-surface-variant">
               More pages may improve source coverage, but can take longer to analyze.
             </p>
             <div className="flex items-center gap-stack-sm flex-wrap">
-              <span className="text-body-sm text-on-surface-variant">Try:</span>
+              <span className="text-body-sm text-slate-500 dark:text-on-surface-variant">Try:</span>
               {EXAMPLES.map((ex) => (
                 <button
                   key={ex}
                   onClick={() => setUrl(ex)}
-                  className="rounded-full border border-outline-variant bg-surface-container-high px-stack-sm py-1 text-body-sm text-secondary transition-colors hover:border-secondary hover:bg-surface-container-highest"
+                  className="rounded-full border border-slate-300 bg-white px-stack-sm py-1 text-body-sm text-indigo-600 transition-colors hover:border-indigo-400 hover:bg-indigo-50 dark:border-outline-variant dark:bg-surface-container-high dark:text-secondary dark:hover:border-secondary dark:hover:bg-surface-container-highest"
                 >
                   {ex.replace("https://", "")}
                 </button>
@@ -206,9 +206,9 @@ export default function Landing() {
         <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-gutter">
           {FEATURES.map((f) => (
             <Card key={f.title} className="flex flex-col gap-stack-sm">
-              <Icon name={f.icon} className="text-secondary text-2xl" />
+              <Icon name={f.icon} className="text-[rgb(0_194_235)] dark:text-secondary text-2xl" />
               <h3 className="text-body-md font-bold">{f.title}</h3>
-              <p className="text-body-sm text-on-surface-variant">{f.body}</p>
+              <p className="text-body-sm text-slate-500 dark:text-on-surface-variant">{f.body}</p>
             </Card>
           ))}
         </section>
